@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-touch-fullscreen" content="yes" />
+    <title>Taufik Hidayat Zebua - Programmer Portfolio</title>
+    <meta
+      name="description"
+      content="3D Interactive Portfolio of Taufik Hidayat Zebua - Programmer & Software Developer"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        /* Disable touch highlight on mobile browsers */
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        /* Disable touch actions that might interfere */
+        touch-action: manipulation;
+      }
+
+      body {
+        font-family: "Rajdhani", sans-serif;
+        background: #0a0a0a;
+        color: #fff;
+        overflow: hidden;
+        height: 100vh;
+        /* Additional mobile optimizations */
+        -webkit-overflow-scrolling: touch;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        /* Prevent pull-to-refresh */
+        overscroll-behavior: none;
+      }
+
+      #canvas-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        /* Prevent mobile browser touch highlights */
+        -webkit-tap-highlight-color: transparent;
+        -webkit-user-select: none;
+        user-select: none;
+        touch-action: none;
+        /* Prevent context menu on long press */
+        -webkit-touch-callout: none;
+        -webkit-user-drag: none;
+        -khtml-user-drag: none;
+        -moz-user-drag: none;
+        -o-user-drag: none;
+      }
+
+      #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          135deg,
+          #0a0a0a 0%,
+          #1a1a2e 50%,
+          #16213e 100%
+        );
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        transition: opacity 1s ease-out;
+      }
+
+      .loading-text {
+        font-family: "Orbitron", monospace;
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #00ffff;
+        text-shadow: 0 0 20px #00ffff;
+        margin-bottom: 2rem;
+        animation: pulse 2s infinite;
+      }
+
+      .loading-name {
+        font-family: "Orbitron", monospace;
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: #00ffff;
+        text-shadow: 0 0 30px #00ffff, 0 0 60px #00ffff;
+        margin-bottom: 2rem;
+        text-align: center;
+        letter-spacing: 0.2rem;
+        animation: glowPulse 3s ease-in-out infinite;
+      }
+
+      @keyframes glowPulse {
+        0%,
+        100% {
+          text-shadow: 0 0 30px #00ffff, 0 0 60px #00ffff;
+          transform: scale(1);
+        }
+        50% {
+          text-shadow: 0 0 40px #00ffff, 0 0 80px #00ffff, 0 0 120px #00ffff;
+          transform: scale(1.05);
+        }
+      }
+
+      .loading-bar {
+        width: 300px;
+        height: 4px;
+        background: rgba(0, 255, 255, 0.2);
+        border-radius: 2px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .loading-progress {
+        height: 100%;
+        background: linear-gradient(90deg, #00ffff, #ff00ff, #00ffff);
+        border-radius: 2px;
+        transition: width 0.3s ease;
+        box-shadow: 0 0 10px #00ffff;
+      }
+
+      .loading-percentage {
+        margin-top: 1rem;
+        font-family: "Orbitron", monospace;
+        color: #00ffff;
+        font-size: 1.2rem;
+      }
+
+      #ui-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 100;
+        pointer-events: none;
+      }
+
+      .ui-panel {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.8);
+        border: 1px solid #00ffff;
+        border-radius: 8px;
+        padding: 1rem;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        pointer-events: auto;
+        transition: all 0.3s ease;
+      }
+
+      .navigation-panel {
+        top: 1.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+        background: rgba(0, 0, 0, 0.9);
+        padding: 0.5rem 1rem;
+        border-radius: 30px;
+        backdrop-filter: blur(15px);
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.15);
+      }
+
+      .nav-button {
+        background: rgba(0, 255, 255, 0.1);
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        color: #00ffff;
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "Rajdhani", sans-serif;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        position: relative;
+        overflow: hidden;
+        /* Prevent mobile tap highlight */
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        touch-action: manipulation;
+        /* Prevent focus outline on mobile */
+        outline: none;
+      }
+
+      .nav-button::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: radial-gradient(
+          circle,
+          rgba(0, 255, 255, 0.3) 0%,
+          transparent 70%
+        );
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        transition: all 0.3s ease;
+        z-index: -1;
+      }
+
+      .nav-button:hover {
+        background: rgba(0, 255, 255, 0.2);
+        border-color: #00ffff;
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        transform: translateY(-1px);
+      }
+
+      .nav-button:hover::before {
+        width: 100%;
+        height: 100%;
+      }
+
+      .nav-button:active {
+        transform: translateY(-1px) scale(0.95);
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+      }
+
+      .nav-button.active {
+        background: rgba(255, 0, 255, 0.2);
+        border-color: #ff00ff;
+        color: #ff00ff;
+        box-shadow: 0 0 15px rgba(255, 0, 255, 0.3);
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .navigation-panel {
+          top: 0.8rem;
+          left: 50%;
+          transform: translateX(-50%);
+          flex-direction: row;
+          gap: 0.3rem;
+          padding: 0.4rem 0.6rem;
+          max-width: 95%;
+          overflow-x: auto;
+        }
+
+        /* Loading screen mobile responsive */
+        .loading-name {
+          font-size: 1.8rem;
+          margin-bottom: 1.5rem;
+          padding: 0 1rem;
+          text-align: center;
+          line-height: 1.2;
+        }
+
+        .loading-text {
+          font-size: 1rem;
+          margin-bottom: 1.5rem;
+          padding: 0 1rem;
+          text-align: center;
+          line-height: 1.3;
+        }
+
+        .loading-bar {
+          width: 80%;
+          height: 4px;
+        }
+
+        .loading-percentage {
+          font-size: 1rem;
+          margin-top: 0.8rem;
+        }
+
+        /* Additional mobile-specific styles */
+        button,
+        input,
+        textarea,
+        select {
+          -webkit-tap-highlight-color: transparent;
+          -webkit-appearance: none;
+          appearance: none;
+          outline: none;
+        }
+
+        /* Prevent context menu on long press for all elements */
+        * {
+          -webkit-touch-callout: none;
+          -webkit-tap-highlight-color: transparent;
+        }
+
+        .nav-button {
+          padding: 0.3rem 0.6rem;
+          font-size: 0.7rem;
+          min-width: 50px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+      <div class="loading-name">TAUFIK HIDAYAT ZEBUA</div>
+      <div class="loading-text" id="loading-text">
+        Initializing Cyberpunk Terminal...
+      </div>
+      <div class="loading-bar">
+        <div class="loading-progress" id="loading-progress"></div>
+      </div>
+      <div class="loading-percentage" id="loading-percentage">0%</div>
+    </div>
+
+    <!-- 3D Canvas Container -->
+    <div id="canvas-container"></div>
+
+    <!-- UI Overlay -->
+    <div id="ui-overlay">
+      <!-- Navigation Panel -->
+      <div class="ui-panel navigation-panel">
+        <button class="nav-button active" data-section="home">Home</button>
+        <button class="nav-button" data-section="about">About</button>
+        <button class="nav-button" data-section="projects">Projects</button>
+        <button class="nav-button" data-section="skills">Skills</button>
+        <button class="nav-button" data-section="contact">Contact</button>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

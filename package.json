@@ -1,0 +1,23 @@
+{
+  "name": "taufik-portfolio-3d",
+  "version": "1.0.0",
+  "description": "3D Interactive Portfolio for Taufik Hidayat Zebua - Programmer",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "http-server dist -p 3000"
+  },
+  "keywords": ["three.js", "3d", "portfolio", "interactive", "webgl"],
+  "author": "Taufik Hidayat Zebua",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "http-server": "^14.1.1"
+  },
+  "dependencies": {
+    "three": "^0.158.0",
+    "gsap": "^3.12.2"
+  }
+}
