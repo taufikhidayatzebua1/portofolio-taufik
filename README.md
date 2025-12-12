@@ -422,10 +422,6 @@ MIT License - lihat [LICENSE](LICENSE) untuk detail.
 ## 👨‍💻 Developer
 
 **Taufik Hidayat Zebua**
-- Portfolio: [Website ini! 🎉]
-- Email: [email]
-- LinkedIn: [linkedin-profile]
-- GitHub: [github-profile]
 
 ## 🙏 Acknowledgments
 
